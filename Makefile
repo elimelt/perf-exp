@@ -3,6 +3,7 @@ CXX = g++
 
 # Compiler flags
 CXXFLAGS = -std=c++17 -O2 -Wall -Wextra
+DEBUGFLAGS = -g
 
 # Directories
 INCLUDE_DIR = include
@@ -21,11 +22,11 @@ OBJS = $(patsubst $(SRC_DIR)/%.cc, $(BUILD_DIR)/%.o, $(SRCS))
 
 # Rule to build the target executable
 $(TARGET): $(OBJS) | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -o $(TARGET) $(OBJS)
+	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -I$(INCLUDE_DIR) -o $(TARGET) $(OBJS)
 
 # Rule to build object files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cc | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
 # Create the build directory if it doesn't exist
 $(BUILD_DIR):
@@ -43,6 +44,10 @@ test: $(TARGET)
 lint:
 	python3 cpplint.py --filter=-legal/copyright $(SRC_DIR)/*.cc $(INCLUDE_DIR)/*.h $(TEST_DIR)/*.cpp
 
+# Debug build
+debug: CXXFLAGS += $(DEBUGFLAGS)
+debug: clean $(TARGET)
+
 # Phony targets
-.PHONY: clean test lint
+.PHONY: clean test lint debug
 
